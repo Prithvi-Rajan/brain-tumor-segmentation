@@ -23,10 +23,14 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
+  cloud_firestore: ^1.0.6
   cupertino_icons: ^1.0.2
   firebase_auth: ^1.1.0
   firebase_core: ^1.0.3
+  firebase_storage:
+  fluttertoast: ^8.0.6
   font_awesome_flutter: ^9.0.0
+  image_picker_web_redux:
 
 dev_dependencies:
   flutter_test:

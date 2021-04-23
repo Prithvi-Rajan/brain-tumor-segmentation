@@ -167,7 +167,6 @@ class _LoginFormState extends State<LoginForm> {
   }
 
   void tryLogIn() async {
-    Navigator.pushNamed(context, '/main');
     if (_formKey.currentState.validate()) {
       try {
         setState(() {
