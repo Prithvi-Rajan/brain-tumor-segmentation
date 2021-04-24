@@ -1,6 +1,4 @@
 import 'dart:html' as html;
-import 'dart:typed_data';
-import 'dart:io' as io;
 import 'package:cancer_segmentation/Utils/constant.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
@@ -16,7 +14,11 @@ class BrainTumorSegmentation extends StatefulWidget {
 class _BrainTumorSegmentationState extends State<BrainTumorSegmentation>
     with TickerProviderStateMixin {
   final storageReference = FirebaseStorage.instance.ref();
-  List<Uint8List> imagesForUpload = [];
+  List<html.File> imagesForUpload = [];
+  List<String> imgURLs = [];
+  String pathToAPI;
+  Reference imageFolder;
+
   @override
   Widget build(BuildContext context) {
     final double widthSize = MediaQuery.of(context).size.width;
@@ -81,27 +83,48 @@ class _BrainTumorSegmentationState extends State<BrainTumorSegmentation>
     );
   }
 
-  uploadPhotos() async {
+  Future<void> loadPictures() async {
+    imagesForUpload =
+        await ImagePickerWeb.getMultiImages(outputType: ImageType.file);
+  }
+
+  Future<void> uploadPhotos() async {
     Fluttertoast.showToast(msg: 'Uploading Photos...\nPlease Wait...');
-    List<String> imgURLs = [];
-    String path = 'bts' + uid ?? 'test';
+
+    String path = 'api/bts/$uid';
     for (var i = 0; i < imagesForUpload.length; i++) {
       final img = imagesForUpload[i];
       String imgID = i.toString();
-      final uploadTask = storageReference.child(path).child(imgID).putData(img);
+      final uploadTask = storageReference.child(path).child(imgID).putBlob(img);
       final taskSnapshot = await uploadTask.whenComplete(() => {});
       String downloadUrl = await taskSnapshot.ref.getDownloadURL();
       imgURLs.add(downloadUrl);
+      imageFolder = taskSnapshot.ref.parent;
     }
   }
 
-  Future<void> loadPictures() async {
-    imagesForUpload =
-        await ImagePickerWeb.getMultiImages(outputType: ImageType.bytes);
+  Future<void> addDocument() async {
+    final data = {
+      'api': 'bts',
+      'initiator': uid,
+      'images': imgURLs,
+      'imageFolder': imageFolder.fullPath,
+      'status': 'pending',
+      'timestamp': DateTime.now().millisecondsSinceEpoch
+    };
+    final ref = await firestoreIns.collection('api-bts').add(data);
+    pathToAPI = ref.path;
+    print(pathToAPI);
+  }
+
+  Future<void> callAPI() async {
+    // TODO: Implement RESTapi here
   }
 
   Future<void> initiateReport() async {
     await loadPictures();
     await uploadPhotos();
+    await addDocument();
+    await callAPI();
   }
 }

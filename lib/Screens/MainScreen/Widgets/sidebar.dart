@@ -13,9 +13,6 @@ class Sidebar extends StatefulWidget {
 class _SidebarState extends State<Sidebar> {
   @override
   Widget build(BuildContext context) {
-    final double widthSize = MediaQuery.of(context).size.width;
-    final double heightSize = MediaQuery.of(context).size.height;
-    bool mobileWidth = widthSize < 800;
     return Container(
       padding: EdgeInsets.all(16.0),
       child: Column(

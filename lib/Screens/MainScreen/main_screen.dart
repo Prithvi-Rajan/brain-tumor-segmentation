@@ -17,6 +17,12 @@ class _MainScreenState extends State<MainScreen> {
   List<Widget> pages = [
     BrainTumorSegmentation(),
   ];
+
+  @override
+  void initState() {
+    super.initState();
+  }
+
   @override
   Widget build(BuildContext context) {
     final double widthSize = MediaQuery.of(context).size.width;
